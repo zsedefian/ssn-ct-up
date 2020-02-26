@@ -2,11 +2,9 @@ package handlers;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.textract.AmazonTextract;
-import com.amazonaws.services.textract.AmazonTextractClientBuilder;
 import com.amazonaws.services.textract.model.*;
 import models.UploadedImage;
-import services.ImageRedactionService;
+import services.RedactionService;
 import services.PersistenceService;
 import services.SsnDetectionService;
 
@@ -15,32 +13,34 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static services.SsnDetectionService.SSN_PATTERN;
 
 /**
  * Handles image uploading.
  */
 public class ImageUploadHandler implements RequestHandler<Document, String> {
 
+    private static final String REPLACEMENT_TEXT = "***";
     private PersistenceService persistenceService;
-    private ImageRedactionService imageRedactionService;
+    private RedactionService redactionService;
     private SsnDetectionService ssnDetectionService;
 
     public ImageUploadHandler() {
         this(
                 new SsnDetectionService(),
                 new PersistenceService(),
-                new ImageRedactionService()
+                new RedactionService()
         );
     }
 
     private ImageUploadHandler(SsnDetectionService ssnDetectionService,
                                PersistenceService persistenceService,
-                               ImageRedactionService imageRedactionService) {
+                               RedactionService redactionService) {
         this.ssnDetectionService = ssnDetectionService;
         this.persistenceService = persistenceService;
-        this.imageRedactionService = imageRedactionService;
+        this.redactionService = redactionService;
     }
 
     /**
@@ -61,12 +61,13 @@ public class ImageUploadHandler implements RequestHandler<Document, String> {
 
             // Redact from image
             BufferedImage img = ImageIO.read(new ByteArrayInputStream(document.getBytes().array()));
-            ssnBlocks.forEach(ssnBlock -> imageRedactionService.redact(img, ssnBlock));
+            ssnBlocks.forEach(ssnBlock -> redactionService.redactImage(img, ssnBlock));
 
             // Redact from text
-            List<String> ssn = ssnBlocks.stream()
-                    .map(block -> block.getText().equals("SSN") ? "***" : block.getText())
-                    .collect(Collectors.toList());
+            String text = ssnBlocks.stream()
+                    .filter(block -> block.getBlockType().equals(BlockType.WORD.toString()))
+                    .map(block -> SSN_PATTERN.matcher(block.getText()).matches() ? REPLACEMENT_TEXT : block.getText())
+                    .collect(Collectors.joining(" "));
 
             // Persist redacted data
             persistenceService.persistImage(new UploadedImage(img, text, context.getIdentity().getIdentityId());

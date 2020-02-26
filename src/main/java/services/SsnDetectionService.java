@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class SsnDetectionService {
 
-    private static final Pattern SSN_PATTERN = Pattern.compile("^\\d{3}-\\d{2}-\\d{4}$");
+    public static final Pattern SSN_PATTERN = Pattern.compile("^\\d{3}-\\d{2}-\\d{4}$");
 
     private AmazonTextract textract;
 
@@ -22,6 +22,11 @@ public class SsnDetectionService {
         this.textract = textract;
     }
 
+    /**
+     * TODO
+     * @param document
+     * @return
+     */
     public List<Block> detectSsnBlocks(Document document) {
         DetectDocumentTextRequest detectDocumentTextRequest = new DetectDocumentTextRequest()
                 .withDocument(document);
