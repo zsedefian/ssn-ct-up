@@ -1,50 +1,34 @@
 package services;
 
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
+import models.RedactedDocument;
+import repositories.DynamoRepository;
+import repositories.S3Repository;
 
 public class PersistenceService {
 
-    private static final Regions REGION = Regions.DEFAULT_REGION;
-    private static final String BUCKET_NAME = ""; // TODO
-
-    private AmazonS3 s3Client;
+    private S3Repository s3Repository;
+    private DynamoRepository dynamoRepository;
 
     public PersistenceService() {
-        this.s3Client = AmazonS3ClientBuilder.standard().withRegion(REGION).build();
+        this(
+                new S3Repository(),
+                new DynamoRepository()
+        );
     }
 
-    public void persistImage(BufferedImage image) {
-        String key = UUID.randomUUID().toString();
-        persistToS3(image, key);
-        persistToDocumentDb(key);
+    public PersistenceService(S3Repository s3Repository, DynamoRepository dynamoRepository) {
+        this.s3Repository = s3Repository;
+        this.dynamoRepository = dynamoRepository;
     }
 
-    private void persistToS3(BufferedImage image, String key) {
-        try {
-            File tempFile = File.createTempFile("redacted", "tmp");
-            ImageIO.write(image, "PNG", tempFile);
-            PutObjectRequest request = new PutObjectRequest(BUCKET_NAME, key, tempFile);
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType("image/png");
-            metadata.addUserMetadata("x-amz-meta-title", "redacted_image");
-            request.setMetadata(metadata);
-            s3Client.putObject(request);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void persistToDocumentDb(String key) {
-
+    /**
+     * Persists the redacted document.
+     * Uploads the image itself to S3, while its metadata and redacted text is stored in DocumentDB.
+     *
+     * @param redactedDocument Image and text which have been redacted.
+     */
+    public void save(RedactedDocument redactedDocument) {
+        s3Repository.save(redactedDocument);
+        dynamoRepository.save(redactedDocument);
     }
 }

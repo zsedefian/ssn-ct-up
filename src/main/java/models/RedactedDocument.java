@@ -2,15 +2,14 @@ package models;
 
 import java.awt.image.BufferedImage;
 
-public class UploadedImage {
+public class RedactedImage {
     private BufferedImage image;
     private String text;
     private String username; // User who uploaded
 
-    public UploadedImage(BufferedImage image, String text, String username) {
+    public RedactedImage(BufferedImage image, String text) {
         this.image = image;
         this.text = text;
-        this.username = username;
     }
 
     public BufferedImage getImage() {
