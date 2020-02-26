@@ -1,38 +1,51 @@
 package models;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.UUID;
 
-public class RedactedImage {
+public class RedactedDocument {
+    private String id;
     private BufferedImage image;
     private String text;
-    private String username; // User who uploaded
+    private List<String> redactedSsnList;
+    private String fileExtension;
+    private String uploaderId;
 
-    public RedactedImage(BufferedImage image, String text) {
+    public RedactedDocument(BufferedImage image,
+                            String text,
+                            List<String> redactedSsnList,
+                            String fileExtension,
+                            String uploaderId) {
         this.image = image;
         this.text = text;
+        this.redactedSsnList = redactedSsnList;
+        this.fileExtension = fileExtension;
+        this.id = "document/" + UUID.randomUUID() + "." + fileExtension;
+        this.uploaderId = uploaderId;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public BufferedImage getImage() {
         return image;
     }
 
-    public void setImage(BufferedImage image) {
-        this.image = image;
-    }
-
     public String getText() {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public List<String> getRedactedSsnList() {
+        return redactedSsnList;
     }
 
-    public String getUsername() {
-        return username;
+    public String getFileExtension() {
+        return fileExtension;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getUploaderId() {
+        return uploaderId;
     }
 }

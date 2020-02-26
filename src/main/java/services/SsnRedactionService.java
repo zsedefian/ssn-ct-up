@@ -20,18 +20,18 @@ import java.util.regex.Pattern;
 /**
  * Redacts any blocks that contains a social security number from an image and its OCR'd text.
  */
-public class RedactionService {
+public class SsnRedactionService {
 
     private static final Pattern SSN_PATTERN = Pattern.compile("^\\d{3}-\\d{2}-(\\d{4}$)");
     private static final String REPLACEMENT_TEXT = "***";
 
     private AmazonTextract textract;
 
-    public RedactionService() {
+    public SsnRedactionService() {
         this(AmazonTextractClientBuilder.defaultClient());
     }
 
-    public RedactionService(AmazonTextract textract) {
+    public SsnRedactionService(AmazonTextract textract) {
         this.textract = textract;
     }
 
@@ -45,7 +45,7 @@ public class RedactionService {
      * @param bytes Byte array of uploaded image to be redacted
      * @return {@link RedactedDocument} containing the modified image and its redacted text.
      */
-    public RedactedDocument redactSsn(byte[] bytes) {
+    public RedactedDocument redact(byte[] bytes, String fileExtension, String identityId) {
         try {
             BufferedImage img = ImageIO.read(new ByteArrayInputStream(bytes));
             StringBuilder text = new StringBuilder();
@@ -62,7 +62,7 @@ public class RedactionService {
                     }
                 }
             }
-            return new RedactedDocument(img, text.toString(), redactedItems);
+            return new RedactedDocument(img, text.toString(), redactedItems, fileExtension, identityId);
         } catch (IOException e) {
             e.printStackTrace();
         }
