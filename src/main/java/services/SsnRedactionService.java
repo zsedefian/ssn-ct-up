@@ -10,9 +10,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,11 +43,12 @@ public class SsnRedactionService {
      * is drawn over its location in the image, and its text is changed to {@link this#REPLACEMENT_TEXT}.
      * The method also tracks the SSNs that were redacted.
      *
-     * @param bytes Byte array of uploaded image to be redacted
+     * @param input Base64-encoded String representation of image to be redacted
      * @return {@link RedactedDocument} containing the modified image and its redacted text.
      */
-    public RedactedDocument redact(byte[] bytes) {
+    public RedactedDocument redact(String input) {
         try {
+            byte[] bytes = Base64.getDecoder().decode(input.split(",")[1]);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
             BufferedImage img = ImageIO.read(inputStream);
             StringBuilder text = new StringBuilder();
@@ -62,9 +63,10 @@ public class SsnRedactionService {
                     } else { // Nothing to redact, add the actual text
                         text.append(block.getText());
                     }
+                    text.append(" ");
                 }
             }
-            String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
+            String mimeType = input.substring(input.indexOf(":") + 1, input.indexOf(";"));
             return new RedactedDocument(img, text.toString(), redactedItems, mimeType);
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,8 +85,9 @@ public class SsnRedactionService {
 
     /**
      * Redacts a block from an image by painting a black rectangle over it.
+     * Mutates the image parameter.
      *
-     * @param img Image to redact blocks fro
+     * @param img Image to redact blocks from
      * @param block Blocks which will be redacted (i.e., replaced by a black rectangle) from the image.
      */
     private void redactFromImage(BufferedImage img, Block block) {

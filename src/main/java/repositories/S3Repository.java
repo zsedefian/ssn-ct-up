@@ -15,7 +15,7 @@ import java.io.InputStream;
 
 public class S3Repository {
 
-    private static final Regions REGION = Regions.DEFAULT_REGION;
+    private static final Regions REGION = Regions.US_EAST_2;
     private static final String BUCKET_NAME = System.getenv("BUCKET_NAME");
 
     private AmazonS3 s3Client;
@@ -33,7 +33,7 @@ public class S3Repository {
             InputStream inputStream = createInputStream(redactedDocument);
             ObjectMetadata objectMetadata = createObjectMetadata(redactedDocument);
             PutObjectRequest request = new PutObjectRequest(
-                    BUCKET_NAME, redactedDocument.getId(), inputStream, objectMetadata
+                    BUCKET_NAME, redactedDocument.getObjectKey(), inputStream, objectMetadata
             );
             System.out.println("Saving image to S3...");
             s3Client.putObject(request);

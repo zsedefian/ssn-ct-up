@@ -49,8 +49,8 @@ public class ImageUploadHandler
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
         RedactedDocument redactedDocument = ssnRedactionService
-                .redact(request.getBody().getBytes())
-                .withUploaderId(context.getIdentity().getIdentityId());
+                .redact(request.getBody())
+                .withUploaderId("zach"); // context.getIdentity().getIdentityId()
         persistenceService.save(redactedDocument);
         if (!redactedDocument.getRedactedSsnList().isEmpty()) {
             notificationService.sendNotification(); // send two msgs for each redacted ssn

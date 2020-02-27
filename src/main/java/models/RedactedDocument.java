@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class RedactedDocument {
-    private String id;
+    private String objectKey;
     private BufferedImage image;
     private String text;
     private List<String> redactedSsnList;
@@ -20,11 +20,11 @@ public class RedactedDocument {
         this.text = text;
         this.redactedSsnList = redactedSsnList;
         this.mimeType = mimeType;
-        this.id = "document/" + UUID.randomUUID() + "." + mimeType;
+        this.objectKey = "document/" + UUID.randomUUID() + "." + mimeType;
     }
 
-    public String getId() {
-        return id;
+    public String getObjectKey() {
+        return objectKey;
     }
 
     public BufferedImage getImage() {
