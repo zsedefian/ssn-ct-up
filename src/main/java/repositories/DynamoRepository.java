@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import models.RedactedDocument;
+import models.UserCredentials;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,14 +24,16 @@ public class DynamoRepository {
     }
 
     public void save(RedactedDocument redactedDocument) {
+        int ssnCount = redactedDocument.getRedactedSsnList().size();
+        UserCredentials userCredentials = redactedDocument.getUserCredentials();
+
         Map<String, AttributeValue> item = new HashMap<>();
         item.put("objectKey", new AttributeValue(redactedDocument.getObjectKey()));
         item.put("date", new AttributeValue().withN(Long.toString(System.currentTimeMillis())));
         item.put("text", new AttributeValue(redactedDocument.getText()));
-        int ssnCount = redactedDocument.getRedactedSsnList().size();
         item.put("ssnCount", new AttributeValue().withN(String.valueOf(ssnCount)));
-        item.put("uploaderId", new AttributeValue(redactedDocument.getUploaderId()));
-        item.put("phone-number", new AttributeValue("(555) 555-5555"));
+        item.put("uploaderId", new AttributeValue(userCredentials.getCognitoId()));
+        item.put("phone-number", new AttributeValue(userCredentials.getPhoneNumber()));
 
         System.out.println("Saving document with " + ssnCount + " redacted SSNs to DynamoDB...");
         dynamoDB.putItem(tableName, item);
