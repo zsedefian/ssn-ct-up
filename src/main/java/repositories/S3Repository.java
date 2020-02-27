@@ -14,8 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class S3Repository {
+
     private static final Regions REGION = Regions.DEFAULT_REGION;
-    private static final String BUCKET_NAME = ""; // TODO get bucket name
+    private static final String BUCKET_NAME = System.getenv("BUCKET_NAME");
 
     private AmazonS3 s3Client;
 
