@@ -54,7 +54,7 @@ public class ImageUploadHandler
                 .withUserCredentials(new UserCredentials("zach", "555-555-5555")); // context.getIdentity().getIdentityId()
         persistenceService.save(redactedDocument);
         if (!redactedDocument.getRedactedSsnList().isEmpty()) {
-            notificationService.sendNotification(); // send two msgs for each redacted ssn
+            notificationService.sendNotification(redactedDocument);
         }
         return new APIGatewayProxyResponseEvent().withBody("Success.").withStatusCode(200);
     }

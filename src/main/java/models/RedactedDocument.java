@@ -16,11 +16,11 @@ public class RedactedDocument {
                             String text,
                             List<String> redactedSsnList,
                             String mimeType) {
+        this.objectKey = "document/" + UUID.randomUUID() + "." + mimeType;
         this.image = image;
         this.text = text;
         this.redactedSsnList = redactedSsnList;
         this.mimeType = mimeType;
-        this.objectKey = "document/" + UUID.randomUUID() + "." + mimeType;
     }
 
     public String getObjectKey() {

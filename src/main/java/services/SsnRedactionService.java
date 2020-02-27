@@ -49,8 +49,7 @@ public class SsnRedactionService {
     public RedactedDocument redact(String input) {
         try {
             byte[] bytes = Base64.getDecoder().decode(input.split(",")[1]);
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-            BufferedImage img = ImageIO.read(inputStream);
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(bytes));
             StringBuilder text = new StringBuilder();
             List<String> redactedItems = new ArrayList<>();
             for (Block block : detectBlocks(bytes)) {
