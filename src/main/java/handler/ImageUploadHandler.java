@@ -43,7 +43,7 @@ public class ImageUploadHandler
      * The image and text are then persisted if their redacted form in DocumentDB.
      *
      * @param request Body contains uploaded image as byte array
-     * @param context  {@link Context} object
+     * @param context {@link Context} object
      * @return Message indicating upload status.
      */
     @Override
@@ -57,6 +57,6 @@ public class ImageUploadHandler
         if (!redactedDocument.getRedactedSsnList().isEmpty()) {
             notificationService.sendNotification(); // send two msgs for each redacted ssn
         }
-        return new APIGatewayProxyResponseEvent().withBody("Success").withStatusCode(200);
+        return new APIGatewayProxyResponseEvent().withBody("Success.").withStatusCode(200);
     }
 }
