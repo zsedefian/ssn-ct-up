@@ -57,6 +57,6 @@ public class ImageUploadHandler
         if (!redactedDocument.getRedactedSsnList().isEmpty()) {
             notificationService.sendNotification(); // send two msgs for each redacted ssn
         }
-        return new APIGatewayProxyResponseEvent().withBody("Success.").withStatusCode(200);
+        return new APIGatewayProxyResponseEvent().withBody("Success").withStatusCode(200);
     }
 }

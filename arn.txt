@@ -1,0 +1,2 @@
+S3 arn:aws:s3:::ssn-ct-bucket
+Policy (write) arn:aws:iam::116621101481:policy/ssn-ct-write-policy
