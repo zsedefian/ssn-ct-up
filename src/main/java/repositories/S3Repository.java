@@ -31,8 +31,9 @@ public class S3Repository {
     public void save(RedactedDocument redactedDocument) {
         try {
             InputStream inputStream = createInputStream(redactedDocument);
+            ObjectMetadata objectMetadata = createObjectMetadata(redactedDocument);
             PutObjectRequest request = new PutObjectRequest(
-                    BUCKET_NAME, redactedDocument.getId(), inputStream, createObjectMetadata()
+                    BUCKET_NAME, redactedDocument.getId(), inputStream, objectMetadata
             );
             System.out.println("Saving image to S3...");
             s3Client.putObject(request);
@@ -44,13 +45,14 @@ public class S3Repository {
 
     private InputStream createInputStream(RedactedDocument redactedDocument) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(redactedDocument.getImage(), redactedDocument.getFileExtension(), outputStream);
+        String fileExtension = redactedDocument.getMimeType().split("/")[1];
+        ImageIO.write(redactedDocument.getImage(), fileExtension, outputStream);
         return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
-    private ObjectMetadata createObjectMetadata() {
+    private ObjectMetadata createObjectMetadata(RedactedDocument redactedDocument) {
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("image/png");
+        metadata.setContentType(redactedDocument.getMimeType());
         metadata.addUserMetadata("x-amz-meta-title", "redacted_image");
         return metadata;
     }

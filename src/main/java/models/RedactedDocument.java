@@ -9,20 +9,18 @@ public class RedactedDocument {
     private BufferedImage image;
     private String text;
     private List<String> redactedSsnList;
-    private String fileExtension;
+    private String mimeType;
     private String uploaderId;
 
     public RedactedDocument(BufferedImage image,
                             String text,
                             List<String> redactedSsnList,
-                            String fileExtension,
-                            String uploaderId) {
+                            String mimeType) {
         this.image = image;
         this.text = text;
         this.redactedSsnList = redactedSsnList;
-        this.fileExtension = fileExtension;
-        this.id = "document/" + UUID.randomUUID() + "." + fileExtension;
-        this.uploaderId = uploaderId;
+        this.mimeType = mimeType;
+        this.id = "document/" + UUID.randomUUID() + "." + mimeType;
     }
 
     public String getId() {
@@ -41,11 +39,16 @@ public class RedactedDocument {
         return redactedSsnList;
     }
 
-    public String getFileExtension() {
-        return fileExtension;
+    public String getMimeType() {
+        return mimeType;
     }
 
     public String getUploaderId() {
         return uploaderId;
+    }
+
+    public RedactedDocument withUploaderId(String uploaderId) {
+        this.uploaderId = uploaderId;
+        return this;
     }
 }

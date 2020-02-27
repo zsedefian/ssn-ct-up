@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +46,10 @@ public class SsnRedactionService {
      * @param bytes Byte array of uploaded image to be redacted
      * @return {@link RedactedDocument} containing the modified image and its redacted text.
      */
-    public RedactedDocument redact(byte[] bytes, String fileExtension, String identityId) {
+    public RedactedDocument redact(byte[] bytes) {
         try {
-            BufferedImage img = ImageIO.read(new ByteArrayInputStream(bytes));
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+            BufferedImage img = ImageIO.read(inputStream);
             StringBuilder text = new StringBuilder();
             List<String> redactedItems = new ArrayList<>();
             for (Block block : detectBlocks(bytes)) {
@@ -56,13 +58,14 @@ public class SsnRedactionService {
                     if (ssnMatcher.matches()) {
                         redactFromImage(img, block);
                         text.append(REPLACEMENT_TEXT);
-                        redactedItems.add(ssnMatcher.group()); // Last four digits of SSN.
+                        redactedItems.add(ssnMatcher.group(1)); // Last four digits of SSN.
                     } else { // Nothing to redact, add the actual text
                         text.append(block.getText());
                     }
                 }
             }
-            return new RedactedDocument(img, text.toString(), redactedItems, fileExtension, identityId);
+            String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
+            return new RedactedDocument(img, text.toString(), redactedItems, mimeType);
         } catch (IOException e) {
             e.printStackTrace();
         }
