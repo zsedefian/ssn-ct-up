@@ -18,7 +18,7 @@ public class S3Repository {
     private static final Regions REGION = Regions.US_EAST_2;
     private static final String BUCKET_NAME = System.getenv("BUCKET_NAME");
 
-    private AmazonS3 s3Client;
+    private final AmazonS3 s3Client;
 
     public S3Repository() {
         this(AmazonS3ClientBuilder.standard().withRegion(REGION).build());

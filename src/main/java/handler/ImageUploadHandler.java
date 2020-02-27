@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import models.RedactedDocument;
+import models.UserCredentials;
 import services.NotificationService;
 import services.PersistenceService;
 import services.SsnRedactionService;
@@ -50,7 +51,7 @@ public class ImageUploadHandler
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
         RedactedDocument redactedDocument = ssnRedactionService
                 .redact(request.getBody())
-                .withUploaderId("zach"); // context.getIdentity().getIdentityId()
+                .withUserCredentials(new UserCredentials("zach", "555-555-5555")); // context.getIdentity().getIdentityId()
         persistenceService.save(redactedDocument);
         if (!redactedDocument.getRedactedSsnList().isEmpty()) {
             notificationService.sendNotification(); // send two msgs for each redacted ssn

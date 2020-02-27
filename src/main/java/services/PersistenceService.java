@@ -6,8 +6,8 @@ import repositories.S3Repository;
 
 public class PersistenceService {
 
-    private S3Repository s3Repository;
-    private DynamoRepository dynamoRepository;
+    private final S3Repository s3Repository;
+    private final DynamoRepository dynamoRepository;
 
     public PersistenceService() {
         this(

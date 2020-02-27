@@ -26,7 +26,7 @@ public class SsnRedactionService {
     private static final Pattern SSN_PATTERN = Pattern.compile("^\\d{3}-\\d{2}-(\\d{4}$)");
     private static final String REPLACEMENT_TEXT = "***";
 
-    private AmazonTextract textract;
+    private final AmazonTextract textract;
 
     public SsnRedactionService() {
         this(AmazonTextractClientBuilder.defaultClient());

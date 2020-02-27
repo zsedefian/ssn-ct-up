@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class RedactedDocument {
-    private String objectKey;
-    private BufferedImage image;
-    private String text;
-    private List<String> redactedSsnList;
-    private String mimeType;
-    private String uploaderId;
+    private final String objectKey;
+    private final BufferedImage image;
+    private final String text;
+    private final List<String> redactedSsnList;
+    private final String mimeType;
+    private UserCredentials userCredentials;
 
     public RedactedDocument(BufferedImage image,
                             String text,
@@ -43,12 +43,12 @@ public class RedactedDocument {
         return mimeType;
     }
 
-    public String getUploaderId() {
-        return uploaderId;
+    public UserCredentials getUserCredentials() {
+        return userCredentials;
     }
 
-    public RedactedDocument withUploaderId(String uploaderId) {
-        this.uploaderId = uploaderId;
+    public RedactedDocument withUserCredentials(UserCredentials $paramName) {
+        userCredentials = $paramName;
         return this;
     }
 }
