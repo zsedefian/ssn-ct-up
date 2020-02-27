@@ -12,13 +12,13 @@ dependencies {
     implementation 'com.amazonaws:aws-lambda-java-core:1.1.0'
     implementation 'com.amazonaws:aws-lambda-java-events:2.2.7'
 //    implementation 'com.amazonaws:aws-java-sdk-docdb:1.11.729'
-    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-dynamodb
     implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-textract:1.11.729'
 
-    testImplementation group: 'junit', name: 'junit', version: '4.11'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
+    testImplementation 'junit:junit:4.11'
+    testImplementation 'org.mockito:mockito-core:3.1.0'
+    testImplementation 'org.spockframework:spock-core:2.0-M2-groovy-3.0'
 }
 
 task buildZip(type: Zip) {
