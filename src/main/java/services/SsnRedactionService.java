@@ -93,11 +93,11 @@ public class SsnRedactionService {
     private void redactFromImage(BufferedImage img, Block block) {
         Graphics2D graph = img.createGraphics();
         graph.setColor(Color.BLACK);
-        graph.fill(calculateRectangle(img, block.getGeometry().getBoundingBox()));
+        graph.fill(createRedactionBox(img, block.getGeometry().getBoundingBox()));
         graph.dispose();
     }
 
-    private Rectangle calculateRectangle(BufferedImage img, BoundingBox boundingBox) {
+    private Rectangle createRedactionBox(BufferedImage img, BoundingBox boundingBox) {
         int width = img.getWidth();
         int height = img.getHeight();
         int x1 = (int) (boundingBox.getLeft() * width);
