@@ -91,28 +91,19 @@ public class SsnRedactionService {
      * @param block Blocks which will be redacted (i.e., replaced by a black rectangle) from the image.
      */
     private void redactFromImage(BufferedImage img, Block block) {
-        Coordinates coordinates = calculateCoordinates(img, block.getGeometry().getBoundingBox());
         Graphics2D graph = img.createGraphics();
         graph.setColor(Color.BLACK);
-        graph.fill(new Rectangle(coordinates.x1, coordinates.y1, coordinates.x2, coordinates.y2));
+        graph.fill(calculateRectangle(img, block.getGeometry().getBoundingBox()));
         graph.dispose();
     }
 
-    private Coordinates calculateCoordinates(BufferedImage img, BoundingBox boundingBox) {
+    private Rectangle calculateRectangle(BufferedImage img, BoundingBox boundingBox) {
         int width = img.getWidth();
         int height = img.getHeight();
-        Coordinates coordinates = new Coordinates();
-        coordinates.x1 = (int) (boundingBox.getLeft() * width);
-        coordinates.y1 = (int) (boundingBox.getTop() * height);
-        coordinates.x2 = (int) (coordinates.x1 + (boundingBox.getWidth() * width));
-        coordinates.y2 = (int) (coordinates.y1 + (boundingBox.getHeight() * height));
-        return coordinates;
-    }
-
-    private static class Coordinates {
-        int x1;
-        int y1;
-        int x2;
-        int y2;
+        int x1 = (int) (boundingBox.getLeft() * width);
+        int y1 = (int) (boundingBox.getTop() * height);
+        int x2 = (int) (boundingBox.getWidth() * width);
+        int y2 = (int) (boundingBox.getHeight() * height);
+        return new Rectangle(x1, y1, x2, y2);
     }
 }
