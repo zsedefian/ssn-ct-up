@@ -65,8 +65,9 @@ public class SsnRedactionService {
                     text.append(" ");
                 }
             }
-            String mimeType = input.substring(input.indexOf(":") + 1, input.indexOf(";"));
-            return new RedactedDocument(img, text.toString(), redactedItems, mimeType);
+            String redactedText = text.toString().trim(); // Remove final space
+            String mimeType = input.substring(input.indexOf(":") + 1, input.indexOf(";")); // e.g. data:image/png;base64
+            return new RedactedDocument(img, redactedText, redactedItems, mimeType);
         } catch (IOException e) {
             e.printStackTrace();
         }

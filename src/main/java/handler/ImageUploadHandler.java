@@ -16,9 +16,9 @@ import services.SsnRedactionService;
 public class ImageUploadHandler
         implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-    private SsnRedactionService ssnRedactionService;
-    private PersistenceService persistenceService;
-    private NotificationService notificationService;
+    private final SsnRedactionService ssnRedactionService;
+    private final PersistenceService persistenceService;
+    private final NotificationService notificationService;
 
     public ImageUploadHandler() {
         this(

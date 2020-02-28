@@ -2,9 +2,27 @@ group 'nuvalence.example.'
 version '1.0'
 
 apply plugin: 'java'
+apply plugin: 'jacoco'
 
 repositories {
     mavenCentral()
+}
+
+jacoco {
+    toolVersion = "0.8.5"
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+test {
+    finalizedBy jacocoTestReport
 }
 
 dependencies {
@@ -18,7 +36,6 @@ dependencies {
 
     testImplementation 'junit:junit:4.11'
     testImplementation 'org.mockito:mockito-core:3.1.0'
-    testImplementation 'org.spockframework:spock-core:2.0-M2-groovy-3.0'
 }
 
 task buildZip(type: Zip) {
