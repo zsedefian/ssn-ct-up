@@ -34,7 +34,7 @@ public class PersistenceServiceTest {
                 "this is text",
                 List.of("list", "of", "items"),
                 "image/png"
-        ).withUserCredentials(new UserCredentials("zach", "555-555-5555"));
+        ).withUserCredentials(new UserCredentials("zach", "+15555555555"));
 
         // when
         persistenceService.save(redactedDocument);

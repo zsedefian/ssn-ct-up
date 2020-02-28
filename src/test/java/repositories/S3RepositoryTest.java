@@ -33,7 +33,7 @@ public class S3RepositoryTest {
                 "this is text",
                 List.of("list", "of", "items"),
                 "image/png"
-        ).withUserCredentials(new UserCredentials("zach", "555-555-5555"));
+        ).withUserCredentials(new UserCredentials("zach", "+15555555555"));
 
         // when
         s3Repository.save(redactedDocument);

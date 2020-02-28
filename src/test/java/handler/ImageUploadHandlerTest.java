@@ -43,7 +43,7 @@ public class ImageUploadHandlerTest {
                 "this is text",
                 List.of("list", "of", "items"),
                 "image/png"
-        ).withUserCredentials(new UserCredentials("zach", "555-555-5555"));
+        ).withUserCredentials(new UserCredentials("zach", "+15555555555"));
 
         // when
         when(ssnRedactionService.redact(any())).thenReturn(redactedDocument);
@@ -67,7 +67,7 @@ public class ImageUploadHandlerTest {
                 "this is text",
                 new ArrayList<>(),
                 "image/png"
-        ).withUserCredentials(new UserCredentials("zach", "555-555-5555"));
+        ).withUserCredentials(new UserCredentials("zach", "+15555555555"));
 
         // when
         when(ssnRedactionService.redact(any())).thenReturn(redactedDocument);
