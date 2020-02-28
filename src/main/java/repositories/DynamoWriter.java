@@ -9,16 +9,16 @@ import models.UserCredentials;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DynamoRepository {
+public class DynamoWriter {
 
     private final AmazonDynamoDB dynamoDB;
     private final String tableName;
 
-    public DynamoRepository() {
+    public DynamoWriter() {
         this(AmazonDynamoDBAsyncClientBuilder.defaultClient(), System.getenv("TABLE_NAME"));
     }
 
-    public DynamoRepository(AmazonDynamoDB dynamoDB, String tableName) {
+    public DynamoWriter(AmazonDynamoDB dynamoDB, String tableName) {
         this.dynamoDB = dynamoDB;
         this.tableName = tableName;
     }

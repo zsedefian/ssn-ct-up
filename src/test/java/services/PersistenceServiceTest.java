@@ -2,14 +2,13 @@ package services;
 
 import models.RedactedDocument;
 import models.UserCredentials;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import repositories.DynamoRepository;
-import repositories.S3Repository;
+import repositories.DynamoWriter;
+import repositories.S3Writer;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -20,9 +19,9 @@ import static org.mockito.Mockito.*;
 public class PersistenceServiceTest {
 
     @Mock
-    private S3Repository s3Repository;
+    private S3Writer s3Writer;
     @Mock
-    private DynamoRepository dynamoRepository;
+    private DynamoWriter dynamoWriter;
     @InjectMocks
     private PersistenceService persistenceService;
 
@@ -40,8 +39,8 @@ public class PersistenceServiceTest {
         persistenceService.save(redactedDocument);
 
         // then
-        verify(s3Repository, atMostOnce()).save(redactedDocument);
-        verify(dynamoRepository, atMostOnce()).save(redactedDocument);
-        verifyNoMoreInteractions(s3Repository, dynamoRepository);
+        verify(s3Writer, atMostOnce()).save(redactedDocument);
+        verify(dynamoWriter, atMostOnce()).save(redactedDocument);
+        verifyNoMoreInteractions(s3Writer, dynamoWriter);
     }
 }

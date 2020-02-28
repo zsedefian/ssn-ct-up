@@ -1,36 +1,27 @@
 package repositories;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.s3.AmazonS3;
 import models.RedactedDocument;
 import models.UserCredentials;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DynamoRepositoryTest {
+public class S3WriterTest {
 
     @Mock
-    private AmazonDynamoDB dynamoDB;
-
-    private DynamoRepository dynamoRepository;
-
-    @Before
-    public void setup() {
-        dynamoRepository = new DynamoRepository(dynamoDB, "TABLE_NAME");
-    }
+    private AmazonS3 s3Client;
+    @InjectMocks
+    private S3Writer s3Writer;
 
     @Test
     public void save_GivenValidRedactedDocument_SaveSuccessfully() {
@@ -43,9 +34,10 @@ public class DynamoRepositoryTest {
         ).withUserCredentials(new UserCredentials("zach", "+15555555555"));
 
         // when
-        dynamoRepository.save(redactedDocument);
+        s3Writer.save(redactedDocument);
 
         // then
-        verify(dynamoDB, times(1)).putItem(any(), any());
+        verify(s3Client, times(1)).putObject(any());
+        verifyNoMoreInteractions(s3Client);
     }
 }

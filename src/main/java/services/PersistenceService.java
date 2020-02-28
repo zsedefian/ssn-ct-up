@@ -1,24 +1,24 @@
 package services;
 
 import models.RedactedDocument;
-import repositories.DynamoRepository;
-import repositories.S3Repository;
+import repositories.DynamoWriter;
+import repositories.S3Writer;
 
 public class PersistenceService {
 
-    private final S3Repository s3Repository;
-    private final DynamoRepository dynamoRepository;
+    private final S3Writer s3Writer;
+    private final DynamoWriter dynamoWriter;
 
     public PersistenceService() {
         this(
-                new S3Repository(),
-                new DynamoRepository()
+                new S3Writer(),
+                new DynamoWriter()
         );
     }
 
-    public PersistenceService(S3Repository s3Repository, DynamoRepository dynamoRepository) {
-        this.s3Repository = s3Repository;
-        this.dynamoRepository = dynamoRepository;
+    public PersistenceService(S3Writer s3Writer, DynamoWriter dynamoWriter) {
+        this.s3Writer = s3Writer;
+        this.dynamoWriter = dynamoWriter;
     }
 
     /**
@@ -28,7 +28,7 @@ public class PersistenceService {
      * @param redactedDocument Image and text which have been redacted.
      */
     public void save(RedactedDocument redactedDocument) {
-        s3Repository.save(redactedDocument);
-        dynamoRepository.save(redactedDocument);
+        s3Writer.save(redactedDocument);
+        dynamoWriter.save(redactedDocument);
     }
 }

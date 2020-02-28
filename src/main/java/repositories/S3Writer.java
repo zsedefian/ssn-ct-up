@@ -13,18 +13,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class S3Repository {
+public class S3Writer {
 
     private static final Regions REGION = Regions.US_EAST_2;
     private static final String BUCKET_NAME = System.getenv("BUCKET_NAME");
 
     private final AmazonS3 s3Client;
 
-    public S3Repository() {
+    public S3Writer() {
         this(AmazonS3ClientBuilder.standard().withRegion(REGION).build());
     }
 
-    public S3Repository(AmazonS3 s3Client) {
+    public S3Writer(AmazonS3 s3Client) {
         this.s3Client = s3Client;
     }
 
