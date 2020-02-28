@@ -11,13 +11,10 @@ import java.util.Map;
 
 public class NotificationService {
 
-    // This is hard-coded here because the rest of the AWS resources are in us-east-2, where topics cannot be created.
-    private static final String TOPIC_ARN = "arn:aws:sns:us-east-1:116621101481:ssn-ct-admin-topic";
-
     private final AmazonSNS snsClient;
 
     public NotificationService() {
-        // As above, need to set SNS to EU_WEST_1 because US_EAST_2 does not support SNS topics.
+        // The default region, US_EAST_2, does not support SNS topics.
         this(AmazonSNSClientBuilder.standard().withRegion(Regions.US_EAST_1).build());
     }
 
@@ -30,15 +27,16 @@ public class NotificationService {
      * social security numbers, as well as any registered phone numbers of administrators.
      */
     public void sendNotification(RedactedDocument redactedDocument) {
-        subscribeToTopic(redactedDocument);
+        String topicArn = snsClient.createTopic("ssn-ct-admin-topic").getTopicArn();
+        subscribeToTopic(topicArn, redactedDocument);
         String message = "SS # detected: " + String.join(", ", redactedDocument.getRedactedSsnList());
         Map<String, MessageAttributeValue> smsAttributes = createSmsAttributes();
-        sendMessageToTopic(message, smsAttributes);
+        sendMessageToTopic(topicArn, message, smsAttributes);
     }
 
-    private void subscribeToTopic(RedactedDocument redactedDocument) {
+    private void subscribeToTopic(String topicArn, RedactedDocument redactedDocument) {
         String uploaderPhoneNumber = redactedDocument.getUserCredentials().getPhoneNumber();
-        SubscribeRequest subscribeRequest = new SubscribeRequest(TOPIC_ARN, "sms", uploaderPhoneNumber);
+        SubscribeRequest subscribeRequest = new SubscribeRequest(topicArn, "sms", uploaderPhoneNumber);
         snsClient.subscribe(subscribeRequest);
     }
 
@@ -50,10 +48,10 @@ public class NotificationService {
         return smsAttributes;
     }
 
-    private void sendMessageToTopic(String message, Map<String, MessageAttributeValue> smsAttributes) {
+    private void sendMessageToTopic(String topicArn, String message, Map<String, MessageAttributeValue> smsAttributes) {
         System.out.println("Sending SMS message...");
         PublishResult result = snsClient.publish(new PublishRequest()
-                .withTopicArn(TOPIC_ARN)
+                .withTopicArn(topicArn)
                 .withMessage(message)
                 .withMessageAttributes(smsAttributes));
         System.out.println("Successfully sent SMS message: " + result);
