@@ -4,6 +4,7 @@ import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.model.CreateTopicResult;
 import models.RedactedDocument;
 import models.UserCredentials;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -22,8 +23,12 @@ public class NotificationServiceTest {
     @Mock
     private AmazonSNS snsClient;
 
-    @InjectMocks
     private NotificationService notificationService;
+
+    @Before
+    public void setup() {
+        notificationService = new NotificationService(snsClient, "+15184285664");
+    }
 
     @Test
     public void sendNotification_GivenDocWithRedactedSsn_SendMessage() {
@@ -39,11 +44,11 @@ public class NotificationServiceTest {
 
         // when
         when(snsClient.createTopic("ssn-ct-admin-topic")).thenReturn(createTopicResult);
-        notificationService.sendNotification(redactedDocument);
+        notificationService.sendNotifications(redactedDocument);
 
         // then
         verify(snsClient, times(1)).createTopic("ssn-ct-admin-topic");
         verify(snsClient, times(1)).subscribe(any());
-        verify(snsClient, times(1)).publish(any());
+        verify(snsClient, times(2)).publish(any());
     }
 }

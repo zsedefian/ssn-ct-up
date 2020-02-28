@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import services.NotificationService;
 import services.PersistenceService;
@@ -17,7 +16,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -53,7 +51,7 @@ public class ImageUploadHandlerTest {
         // then
         verify(ssnRedactionService, times(1)).redact(any());
         verify(persistenceService, times(1)).save(redactedDocument);
-        verify(notificationService, times(1)).sendNotification(redactedDocument);
+        verify(notificationService, times(1)).sendNotifications(redactedDocument);
         verifyNoMoreInteractions(ssnRedactionService, persistenceService, notificationService);
     }
 
