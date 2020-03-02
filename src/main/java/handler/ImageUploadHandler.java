@@ -10,6 +10,8 @@ import services.NotificationService;
 import services.PersistenceService;
 import services.SsnRedactionService;
 
+import java.util.Map;
+
 /**
  * Handles image uploading.
  */
@@ -56,6 +58,9 @@ public class ImageUploadHandler
         if (!redactedDocument.getRedactedSsnList().isEmpty()) {
             notificationService.sendNotifications(redactedDocument);
         }
-        return new APIGatewayProxyResponseEvent().withBody("Success.").withStatusCode(200);
+        return new APIGatewayProxyResponseEvent()
+                .withStatusCode(200)
+                .withHeaders(Map.of("Access-Control-Allow-Origin", "*"))
+                .withBody("Success.");
     }
 }
