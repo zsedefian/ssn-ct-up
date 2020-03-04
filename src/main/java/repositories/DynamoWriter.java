@@ -32,7 +32,7 @@ public class DynamoWriter {
         item.put("date", new AttributeValue().withN(Long.toString(System.currentTimeMillis())));
         item.put("text", new AttributeValue(redactedDocument.getText()));
         item.put("ssnCount", new AttributeValue().withN(String.valueOf(ssnCount)));
-        item.put("uploaderId", new AttributeValue(userCredentials.getCognitoId()));
+        item.put("uploaderId", new AttributeValue(userCredentials.getUsername()));
         item.put("phone-number", new AttributeValue(userCredentials.getPhoneNumber()));
 
         System.out.println("Saving document with " + ssnCount + " redacted SSNs to DynamoDB...");

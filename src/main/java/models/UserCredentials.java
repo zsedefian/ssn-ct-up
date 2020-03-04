@@ -1,16 +1,16 @@
 package models;
 
 public class UserCredentials {
-    private final String cognitoId;
+    private final String username;
     private final String phoneNumber;
 
-    public UserCredentials(String cognitoId, String phoneNumber) {
-        this.cognitoId = cognitoId;
+    public UserCredentials(String username, String phoneNumber) {
+        this.username = username;
         this.phoneNumber = phoneNumber;
     }
 
-    public String getCognitoId() {
-        return cognitoId;
+    public String getUsername() {
+        return username;
     }
 
     public String getPhoneNumber() {

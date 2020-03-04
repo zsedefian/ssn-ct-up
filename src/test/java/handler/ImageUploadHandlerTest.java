@@ -11,10 +11,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import services.NotificationService;
 import services.PersistenceService;
 import services.SsnRedactionService;
+import services.UserCredentialsService;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -22,6 +24,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ImageUploadHandlerTest {
 
+    @Mock
+    private UserCredentialsService userCredentialsService;
     @Mock
     private SsnRedactionService ssnRedactionService;
     @Mock
@@ -35,6 +39,7 @@ public class ImageUploadHandlerTest {
     public void handleRequest_GivenOneOrMoreSsn_SendNotification() {
         // given
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent()
+                .withHeaders(Map.of("Authorization", "eyJraWQiOiIzS2t4ZkZmZjU0XC9cLzFcL0VURDBxRmNEM1NUNUxSZDEzRUl5S0lRUCt5Um5NPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJjOWRlMTBhMC1iMmIzLTQwN2EtYjYzZi0yZGUyOGRkMDQ1NDAiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMi5hbWF6b25hd3MuY29tXC91cy1lYXN0LTJfVG84d3g5eEU5IiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjpmYWxzZSwiY29nbml0bzp1c2VybmFtZSI6InpzZWRlZmlhbiIsImF1ZCI6IjM2cG5oa2w4bHZjMnRtNWtqbWVzN2djOThlIiwiZXZlbnRfaWQiOiI5MTczNjM4MC1kZDNlLTRkN2EtOWVkYS02ZTE5NDc2Y2FlYWIiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTU4MzI3Mjk2NywicGhvbmVfbnVtYmVyIjoiKzE1MTg0Mjg1NjY0IiwiZXhwIjoxNTgzMzUzNjMwLCJpYXQiOjE1ODMzNTAwMzAsImVtYWlsIjoiemFjaEBudXZhbGVuY2UuaW8ifQ.gdYMTCOdxF_CUIZznkyNRiuadfTaLtmI0KfKua8YfGDrWaEakH70zPd_BgHL1Q2oG8waKN4PemvCHhhoRJNdyjNLACEqwVT9Vx7ACdEnwqBCHvafbX1gsWWequu6JDCGt0OwvpCtq7P_MeTth-FWzRSA5hZL5ocXW5YHybLulxS8jI89X1vqGF-5tmB37WMOKL1VAQbiOvM-lfB_vhNjP2TYxjwT67VgMOWyZsYAZIzw0wuMW_46W0DotHwt_ftnqoNU_GRFwEe0DTkRuEqsqvfdeiRkeVtaqimxEMbOl3kh4lXS8CFAj_8G-BOWFyZF8aef12luh9HXZIDWVfEmCg"))
                 .withBody(getBase64EncodedString());
         RedactedDocument redactedDocument = new RedactedDocument(
                 new BufferedImage(1, 1, 1),
@@ -49,6 +54,7 @@ public class ImageUploadHandlerTest {
         imageUploadHandler.handleRequest(request, any());
 
         // then
+        verify(userCredentialsService, times(1)).getUserCredentials(anyString());
         verify(ssnRedactionService, times(1)).redact(any());
         verify(persistenceService, times(1)).save(redactedDocument);
         verify(notificationService, times(1)).sendNotifications(redactedDocument);
@@ -59,6 +65,7 @@ public class ImageUploadHandlerTest {
     public void handleRequest_GivenNoSsnIsFound_DoNotSendNotification() {
         // given
         APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent()
+                .withHeaders(Map.of("Authorization", "eyJraWQiOiIzS2t4ZkZmZjU0XC9cLzFcL0VURDBxRmNEM1NUNUxSZDEzRUl5S0lRUCt5Um5NPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJjOWRlMTBhMC1iMmIzLTQwN2EtYjYzZi0yZGUyOGRkMDQ1NDAiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMi5hbWF6b25hd3MuY29tXC91cy1lYXN0LTJfVG84d3g5eEU5IiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjpmYWxzZSwiY29nbml0bzp1c2VybmFtZSI6InpzZWRlZmlhbiIsImF1ZCI6IjM2cG5oa2w4bHZjMnRtNWtqbWVzN2djOThlIiwiZXZlbnRfaWQiOiI5MTczNjM4MC1kZDNlLTRkN2EtOWVkYS02ZTE5NDc2Y2FlYWIiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTU4MzI3Mjk2NywicGhvbmVfbnVtYmVyIjoiKzE1MTg0Mjg1NjY0IiwiZXhwIjoxNTgzMzUzNjMwLCJpYXQiOjE1ODMzNTAwMzAsImVtYWlsIjoiemFjaEBudXZhbGVuY2UuaW8ifQ.gdYMTCOdxF_CUIZznkyNRiuadfTaLtmI0KfKua8YfGDrWaEakH70zPd_BgHL1Q2oG8waKN4PemvCHhhoRJNdyjNLACEqwVT9Vx7ACdEnwqBCHvafbX1gsWWequu6JDCGt0OwvpCtq7P_MeTth-FWzRSA5hZL5ocXW5YHybLulxS8jI89X1vqGF-5tmB37WMOKL1VAQbiOvM-lfB_vhNjP2TYxjwT67VgMOWyZsYAZIzw0wuMW_46W0DotHwt_ftnqoNU_GRFwEe0DTkRuEqsqvfdeiRkeVtaqimxEMbOl3kh4lXS8CFAj_8G-BOWFyZF8aef12luh9HXZIDWVfEmCg"))
                 .withBody(getBase64EncodedString());
         RedactedDocument redactedDocument = new RedactedDocument(
                 new BufferedImage(1, 1, 1),
@@ -73,6 +80,7 @@ public class ImageUploadHandlerTest {
         imageUploadHandler.handleRequest(request, any());
 
         // then
+        verify(userCredentialsService, times(1)).getUserCredentials(anyString());
         verify(ssnRedactionService, times(1)).redact(any());
         verify(persistenceService, times(1)).save(redactedDocument);
         verifyNoInteractions(notificationService);

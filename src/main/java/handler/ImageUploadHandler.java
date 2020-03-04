@@ -9,6 +9,7 @@ import models.UserCredentials;
 import services.NotificationService;
 import services.PersistenceService;
 import services.SsnRedactionService;
+import services.UserCredentialsService;
 
 import java.util.Map;
 
@@ -18,21 +19,25 @@ import java.util.Map;
 public class ImageUploadHandler
         implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
+    private final UserCredentialsService userCredentialsService;
     private final SsnRedactionService ssnRedactionService;
     private final PersistenceService persistenceService;
     private final NotificationService notificationService;
 
     public ImageUploadHandler() {
         this(
+                new UserCredentialsService(),
                 new SsnRedactionService(),
                 new PersistenceService(),
                 new NotificationService()
         );
     }
 
-    private ImageUploadHandler(SsnRedactionService ssnRedactionService,
+    private ImageUploadHandler(UserCredentialsService userCredentialsService,
+                               SsnRedactionService ssnRedactionService,
                                PersistenceService persistenceService,
                                NotificationService notificationService) {
+        this.userCredentialsService = userCredentialsService;
         this.ssnRedactionService = ssnRedactionService;
         this.persistenceService = persistenceService;
         this.notificationService = notificationService;
@@ -51,9 +56,11 @@ public class ImageUploadHandler
      */
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
+        UserCredentials userCredentials = userCredentialsService
+                .getUserCredentials(request.getHeaders().get("Authorization"));
         RedactedDocument redactedDocument = ssnRedactionService
                 .redact(request.getBody())
-                .withUserCredentials(new UserCredentials("zach", "+15555555555")); // context.getIdentity().getIdentityId()
+                .withUserCredentials(userCredentials);
         persistenceService.save(redactedDocument);
         if (!redactedDocument.getRedactedSsnList().isEmpty()) {
             notificationService.sendNotifications(redactedDocument);

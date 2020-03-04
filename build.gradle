@@ -8,6 +8,11 @@ repositories {
     mavenCentral()
 }
 
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = configurations.compile
+}
+
 jacoco {
     toolVersion = "0.8.5"
     reportsDir = file("$buildDir/reports/jacoco")
@@ -30,11 +35,13 @@ dependencies {
     implementation 'com.amazonaws:aws-lambda-java-core:1.1.0'
     implementation 'com.amazonaws:aws-lambda-java-events:2.2.7'
 //    implementation 'com.amazonaws:aws-java-sdk-docdb:1.11.729'
+    implementation 'com.amazonaws:aws-java-sdk:1.11.736'
     implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-textract:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-sns:1.11.732'
-
+    implementation 'com.auth0:java-jwt:3.10.0'
+    implementation 'org.json:json:20190722'
 
     testImplementation 'junit:junit:4.11'
     testImplementation 'org.mockito:mockito-core:3.1.0'
