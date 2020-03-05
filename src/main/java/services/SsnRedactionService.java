@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -48,17 +49,18 @@ public class SsnRedactionService {
      */
     public RedactedDocument redact(String input) {
         try {
-            byte[] bytes = Base64.getDecoder().decode(input.split(",")[1]);
-            BufferedImage img = ImageIO.read(new ByteArrayInputStream(bytes));
+            String encodedImg = input.split(",")[1];
+            byte[] decodedImg = Base64.getDecoder().decode(encodedImg.getBytes(StandardCharsets.UTF_8));
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(decodedImg));
             StringBuilder text = new StringBuilder();
-            List<String> redactedItems = new ArrayList<>();
-            for (Block block : detectBlocks(bytes)) {
+            List<String> redactedSsnList = new ArrayList<>();
+            for (Block block : detectBlocks(decodedImg)) {
                 if (block.getBlockType().equals(BlockType.WORD.toString())) {
                     Matcher ssnMatcher = SSN_PATTERN.matcher(block.getText());
                     if (ssnMatcher.matches()) {
                         redactFromImage(img, block);
                         text.append(REPLACEMENT_TEXT);
-                        redactedItems.add(ssnMatcher.group(1)); // Last four digits of SSN.
+                        redactedSsnList.add(ssnMatcher.group(1)); // Last four digits of SSN.
                     } else { // Nothing to redact, add the actual text
                         text.append(block.getText());
                     }
@@ -67,7 +69,7 @@ public class SsnRedactionService {
             }
             String redactedText = text.toString().trim(); // Remove final space
             String mimeType = input.substring(input.indexOf(":") + 1, input.indexOf(";")); // e.g. data:image/png;base64
-            return new RedactedDocument(img, redactedText, redactedItems, mimeType);
+            return new RedactedDocument(img, redactedText, redactedSsnList, mimeType);
         } catch (IOException e) {
             e.printStackTrace();
         }
