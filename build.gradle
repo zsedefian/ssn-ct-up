@@ -2,6 +2,8 @@ group 'nuvalence.example.'
 version '1.0'
 
 apply plugin: 'java'
+sourceCompatibility = 11
+targetCompatibility = 11
 apply plugin: 'jacoco'
 
 repositories {
@@ -34,13 +36,11 @@ dependencies {
     implementation platform('software.amazon.awssdk:bom:2.5.29')
     implementation 'com.amazonaws:aws-lambda-java-core:1.1.0'
     implementation 'com.amazonaws:aws-lambda-java-events:2.2.7'
-//    implementation 'com.amazonaws:aws-java-sdk-docdb:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-textract:1.11.729'
     implementation 'com.amazonaws:aws-java-sdk-sns:1.11.732'
     implementation 'com.auth0:java-jwt:3.10.0'
-    implementation 'org.json:json:20190722'
 
     testImplementation 'junit:junit:4.11'
     testImplementation 'org.mockito:mockito-core:3.1.0'
@@ -53,4 +53,4 @@ task buildZip(type: Zip) {
         from configurations.runtimeClasspath
     }
 }
-assemble.dependsOn(buildZip)
+buildZip.dependsOn(build)
