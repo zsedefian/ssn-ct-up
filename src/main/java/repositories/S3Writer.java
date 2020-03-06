@@ -13,6 +13,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Responsible for saving actual redacted image to S3 bucket.
+ */
 public class S3Writer {
 
     private static final Regions REGION = Regions.US_EAST_2;
@@ -28,6 +31,11 @@ public class S3Writer {
         this.s3Client = s3Client;
     }
 
+    /**
+     * Saves a redacted image to an S3 bucket.
+     *
+     * @param redactedDocument Redacted document object which contains actual image.
+     */
     public void save(RedactedDocument redactedDocument) {
         try {
             InputStream inputStream = createInputStream(redactedDocument);

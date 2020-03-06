@@ -4,6 +4,9 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Models a redacted image and related metadata as well as its redacted, OCR'd text.
+ */
 public class RedactedDocument {
     private final String objectKey;
     private final BufferedImage image;

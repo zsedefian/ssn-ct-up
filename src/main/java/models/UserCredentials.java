@@ -1,5 +1,8 @@
 package models;
 
+/**
+ * Credentials of uploading user.
+ */
 public class UserCredentials {
     private final String username;
     private final String phoneNumber;

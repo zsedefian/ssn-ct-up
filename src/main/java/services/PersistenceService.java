@@ -4,6 +4,9 @@ import models.RedactedDocument;
 import repositories.DynamoWriter;
 import repositories.S3Writer;
 
+/**
+ * Responsible for storing image data.
+ */
 public class PersistenceService {
 
     private final S3Writer s3Writer;

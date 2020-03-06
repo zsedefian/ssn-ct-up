@@ -9,6 +9,9 @@ import models.UserCredentials;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Writes image meta data to DynamoDB table.
+ */
 public class DynamoWriter {
 
     private final AmazonDynamoDB dynamoDB;
@@ -23,6 +26,11 @@ public class DynamoWriter {
         this.tableName = tableName;
     }
 
+    /**
+     * Saves the redacted image meta data in a DynamoDB table.
+     *
+     * @param redactedDocument Contains metadata on redacted image
+     */
     public void save(RedactedDocument redactedDocument) {
         int ssnCount = redactedDocument.getRedactedSsnList().size();
         UserCredentials userCredentials = redactedDocument.getUserCredentials();
