@@ -18,12 +18,17 @@ public class UserCredentialsService {
      * @return User credentials object
      */
     public UserCredentials getUserCredentials(String jwtToken) {
-        Map<String, Claim> claims = JWT.decode(jwtToken.substring("Bearer ".length())).getClaims();
-        Claim usernameClaim = claims.get("cognito:username");
+        Map<String, Claim> claims = JWT.decode(trimPrefix(jwtToken)).getClaims();
+        Claim username = claims.get("cognito:username");
         Claim phoneNumber = claims.get("phone_number");
-        if (usernameClaim.isNull() || phoneNumber.isNull()) {
+        if (username.isNull() || phoneNumber.isNull()) {
             throw new IllegalStateException("Username and phone number must be provided.");
         }
-        return new UserCredentials(usernameClaim.asString(), phoneNumber.asString());
+        return new UserCredentials(username.asString(), phoneNumber.asString());
+    }
+
+    private String trimPrefix(String jwtToken) {
+        String prefix = "Bearer ";
+        return jwtToken.startsWith(prefix) ? jwtToken.substring(prefix.length()) : jwtToken;
     }
 }

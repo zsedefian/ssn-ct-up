@@ -56,8 +56,9 @@ public class ImageUploadHandler
      */
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
+        String authToken = request.getHeaders().get("Authorization");
         UserCredentials userCredentials = userCredentialsService
-                .getUserCredentials(request.getHeaders().get("Authorization"));
+                .getUserCredentials(authToken);
         RedactedDocument redactedDocument = ssnRedactionService
                 .redact(request.getBody())
                 .withUserCredentials(userCredentials);
