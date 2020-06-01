@@ -50,8 +50,8 @@ public class RedactedDocument {
         return userCredentials;
     }
 
-    public RedactedDocument withUserCredentials(UserCredentials $paramName) {
-        userCredentials = $paramName;
+    public RedactedDocument withUserCredentials(UserCredentials userCredentials) {
+        this.userCredentials = userCredentials;
         return this;
     }
 }

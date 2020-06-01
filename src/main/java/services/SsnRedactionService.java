@@ -12,11 +12,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 /**
@@ -24,7 +23,8 @@ import java.util.regex.Pattern;
  */
 public class SsnRedactionService {
 
-    private static final Pattern SSN_PATTERN = Pattern.compile("^\\d{3}-\\d{2}-(\\d{4}$)");
+    private static final String SSN = "^\\d{3}-\\d{2}-(\\d{4}$)";
+    private static final Pattern SSN_PATTERN = Pattern.compile("^\\d{3}-\\d{2}-\\d{4}$");
     private static final String REPLACEMENT_TEXT = "***";
 
     private final AmazonTextract textract;
@@ -48,55 +48,51 @@ public class SsnRedactionService {
      * @return {@link RedactedDocument} containing the modified image and its redacted text.
      */
     public RedactedDocument redact(String input) {
-        try {
-            String encodedImg = input.split(",")[1];
-            byte[] decodedImg = Base64.getDecoder().decode(encodedImg.getBytes(StandardCharsets.UTF_8));
-            BufferedImage img = ImageIO.read(new ByteArrayInputStream(decodedImg));
-            StringBuilder text = new StringBuilder();
-            List<String> redactedSsnList = new ArrayList<>();
-            for (Block block : detectBlocks(decodedImg)) {
-                if (block.getBlockType().equals(BlockType.WORD.toString())) {
-                    Matcher ssnMatcher = SSN_PATTERN.matcher(block.getText());
-                    if (ssnMatcher.matches()) {
-                        redactFromImage(img, block);
-                        text.append(REPLACEMENT_TEXT);
-                        redactedSsnList.add(ssnMatcher.group(1)); // Last four digits of SSN.
-                    } else { // Nothing to redact, add the actual text
-                        text.append(block.getText());
-                    }
-                    text.append(" ");
-                }
-            }
-            String redactedText = text.toString().trim(); // Remove final space
-            String mimeType = input.substring(input.indexOf(":") + 1, input.indexOf(";")); // e.g. data:image/png;base64
-            return new RedactedDocument(img, redactedText, redactedSsnList, mimeType);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        String encodedImg = input.split(",")[1];
+        byte[] decodedImg = Base64.getDecoder().decode(encodedImg.getBytes(StandardCharsets.UTF_8));
+
+        List<Block> wordBlocks = detectWordBlocks(decodedImg);
+        List<Block> ssnBlocks = wordBlocks.stream()
+                .filter(block -> SSN_PATTERN.matcher(block.getText()).matches())
+                .collect(Collectors.toList());
+
+        BufferedImage redactedImage = redactFromImage(ssnBlocks, decodedImg);
+        String fullText = wordBlocks.stream().map(Block::getText).collect(Collectors.joining(" "));
+        System.out.println(fullText);
+        String redactedText = SSN_PATTERN.matcher(fullText).replaceAll(REPLACEMENT_TEXT);
+        List<String> redactedSsnList = ssnBlocks.stream()
+                .map(block -> block.getText().substring(7))
+                .collect(Collectors.toList());
+        String mimeType = input.substring(input.indexOf(":") + 1, input.indexOf(";")); // e.g. data:image/png;base64
+        return new RedactedDocument(redactedImage, redactedText, redactedSsnList, mimeType);
     }
 
-    private List<Block> detectBlocks(byte[] bytes) {
+    private List<Block> detectWordBlocks(byte[] bytes) {
         Document document = new Document().withBytes(ByteBuffer.wrap(bytes));
         DetectDocumentTextRequest detectDocumentTextRequest = new DetectDocumentTextRequest()
                 .withDocument(document);
         return textract
                 .detectDocumentText(detectDocumentTextRequest)
-                .getBlocks();
+                .getBlocks()
+                .stream()
+                .filter(block -> block.getBlockType().equals(BlockType.WORD.toString()))
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Redacts a block from an image by painting a black rectangle over it.
-     * Mutates the image parameter.
-     *
-     * @param img Image to redact blocks from
-     * @param block Blocks which will be redacted (i.e., replaced by a black rectangle) from the image.
-     */
-    private void redactFromImage(BufferedImage img, Block block) {
-        Graphics2D graph = img.createGraphics();
-        graph.setColor(Color.BLACK);
-        graph.fill(createRedactionBox(img, block.getGeometry().getBoundingBox()));
-        graph.dispose();
+    private BufferedImage redactFromImage(List<Block> ssnBlocks, byte[] decodedImg) {
+        try {
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(decodedImg));
+            ssnBlocks.forEach(block -> {
+                Graphics2D graph = img.createGraphics();
+                graph.setColor(Color.BLACK);
+                graph.fill(createRedactionBox(img, block.getGeometry().getBoundingBox()));
+                graph.dispose();
+            });
+            return img;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private Rectangle createRedactionBox(BufferedImage img, BoundingBox boundingBox) {

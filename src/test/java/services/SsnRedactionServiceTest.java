@@ -56,10 +56,10 @@ public class SsnRedactionServiceTest {
         // then
         assertNotNull(redactedDocument.getImage());
         assertNotNull(redactedDocument.getObjectKey());
-        assertEquals(redactedDocument.getRedactedSsnList().size(), 1);
-        assertEquals(redactedDocument.getRedactedSsnList().get(0), "3434");
-        assertEquals(redactedDocument.getText(), "This is an example *** 4143-4-1231");
-        assertEquals(redactedDocument.getMimeType(), "image/png");
+        assertEquals(1, redactedDocument.getRedactedSsnList().size());
+        assertEquals("3434", redactedDocument.getRedactedSsnList().get(0));
+        assertEquals("This is an example *** 4143-4-1231", redactedDocument.getText());
+        assertEquals( "image/png", redactedDocument.getMimeType());
     }
 
     private Geometry getGeometry() {
